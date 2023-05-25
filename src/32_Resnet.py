@@ -154,14 +154,14 @@ print(train_x.shape, train_y.shape)
 print(val_x.shape, val_y.shape)
 
 
-EPOCHS = 100
+EPOCHS = 1000
 BATCH_SIZE = 256
 LR = 0.001
 kf = KFold(n_splits=5)
 callbacks = [
     EarlyStopping(monitor='val_loss', patience=15),
     ReduceLROnPlateau(monitor='val_loss', factor=0.1, patience=5),
-    ModelCheckpoint('../models/230522-Resnet', monitor='val_loss', save_best_only=True)
+    ModelCheckpoint('../models/230524-Resnet-HeUniform', monitor='val_loss', save_best_only=True)
 ]
 
 model = ResNet34()
