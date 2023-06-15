@@ -1,6 +1,7 @@
 import gzip
 import pickle
 import random
+import warnings
 import numpy as np
 import matplotlib.pyplot as plt
 from utils.signal_processing import *
@@ -14,6 +15,7 @@ from keras.callbacks import EarlyStopping, ModelCheckpoint, ReduceLROnPlateau
 from keras.layers import Conv1D, Conv1DTranspose, MaxPooling1D, AveragePooling1D, Dense, BatchNormalization, Activation, Add, Flatten, Dropout, Concatenate
 print(f'Is GPU Avaliable: {tf.config.list_physical_devices("GPU")}')
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
+warnings.filterwarnings(action='ignore')
 
 DATA_PATH = '/root/Workspace/DataWarehouse/stMary_RRpo'
 
@@ -96,16 +98,16 @@ class Unet(Model):
 
     @tf.function
     def call(self, inputs, training=None, mask=None):
-        x = inputs
+        x = inputs # 1800
 
-        x, feature_map1 = self.contraction_blocks[0](x)
-        x, feature_map2 = self.contraction_blocks[1](x)
-        x, feature_map3 = self.contraction_blocks[2](x)
-        # x, feature_map4 = self.contraction_blocks[3](x)
+        x, feature_map1 = self.contraction_blocks[0](x) # 32->64 900
+        x, feature_map2 = self.contraction_blocks[1](x) # 64->128 450
+        x, feature_map3 = self.contraction_blocks[2](x) # 128->256 225
+        # x, feature_map4 = self.contraction_blocks[3](x) # 256->512 
 
         x = self.bottleneck_block(x)
 
-        x = self.expansion_blocks[1](x, feature_map3)
+        x = self.expansion_blocks[1](x, feature_map3) # 256->128 
         x = self.expansion_blocks[2](x, feature_map2)
         x = self.expansion_blocks[3](x, feature_map1)
         # x = self.expansion_blocks[3](x, feature_map1)
