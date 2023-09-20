@@ -53,13 +53,13 @@ class CNNLSTM(Model):
         x = self.bn1(x, training=training)
         x = Activation('relu')(x)
         x = Dropout(0.2)(x)
-        x = MaxPooling1D(kernel_size=2, strides=2)(x)
+        x = MaxPooling1D(pool_size=2, strides=2)(x)
 
         x = self.conv1(inputs)
         x = self.bn1(x, training=training)
         x = Activation('relu')(x)
         x = Dropout(0.2)(x)
-        x = MaxPooling1D(kernel_size=2, strides=2)(x)
+        x = MaxPooling1D(pool_size=2, strides=2)(x)
 
         x = self.lstm1(x)
         x = Dropout(0.2)(x)
@@ -93,8 +93,8 @@ class CNNLSTM(Model):
 class BiLSTM(Model):
     def __init__(self, *args, **kwargs):
         super(BiLSTM, self).__init__(*args, **kwargs)
-        self.bilstm1 = Bidirectional(LSTM(512, activation='tanh', return_sequences=True))
-        self.bilstm2 = Bidirectional(LSTM(256, activation='tanh'))
+        self.bilstm1 = Bidirectional(LSTM(64, activation='tanh', return_sequences=True))
+        self.bilstm2 = Bidirectional(LSTM(32, activation='tanh'))
         self.d1 = Dense(1000, activation='relu')
         self.d2 = Dense(1000, activation='relu')
         self.d3 = Dense(1)
@@ -134,10 +134,11 @@ class BiLSTMAttn(Model):
     def __init__(self, units, units_attn, dropout):
         super(BiLSTMAttn, self).__init__()
         self.bilstm1 = Bidirectional(LSTM(units=units, dropout=dropout, return_sequences=True))
-        self.bilstm2 = Bidirectional(LSTM(units=units, dropout=dropout, return_sequences=True, return_state=True))
+        self.bilstm2 = Bidirectional(LSTM(units=units//2, dropout=dropout, return_sequences=True, return_state=True))
         self.attention = BahdanauAttention(units_attn)
-        self.d20 = Dense(20, activation='relu')
-        self.d1 = Dense(1)
+        self.d1 = Dense(1000, activation='relu')
+        self.d2 = Dense(1000, activation='relu')
+        self.d3 = Dense(1)
 
     @tf.function
     def call(self, inputs, training=None, mask=None):
@@ -145,8 +146,8 @@ class BiLSTMAttn(Model):
         x, forward_h, _, backward_h, _ = self.bilstm2(x)
         state_h = Concatenate()([forward_h, backward_h])
         context, attention_weights = self.attention(x, state_h)
-        x = self.d20(context)
-        x = Dropout(0.5)(x)
-        x = self.d1(x)
+        x = self.d1(context)
+        x = self.d2(x)
+        x = self.d3(x)
         return x
 

@@ -34,9 +34,9 @@ class ResnetIdentityBlock(tf.keras.Model):
         return Activation('relu')(x)
 
 
-class ResNet(tf.keras.Model):
+class BianResNet(tf.keras.Model):
     def __init__(self):
-        super(ResNet, self).__init__()
+        super(BianResNet, self).__init__()
         self.resnet_block = [ResnetIdentityBlock(6*(2**i), 3, 2) for i in range(5)]
         self.max1d = MaxPooling1D(strides=2, padding='same')
         self.flatten = Flatten()
