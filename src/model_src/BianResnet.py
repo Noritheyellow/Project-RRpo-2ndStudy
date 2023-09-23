@@ -5,7 +5,7 @@ from keras.callbacks import EarlyStopping, ModelCheckpoint, ReduceLROnPlateau
 from keras.layers import Conv1D, Add, LeakyReLU, MaxPooling1D, Flatten, Dense, BatchNormalization, Activation
 
 
-class ResnetIdentityBlock(tf.keras.Model):
+class ResnetIdentityBlock(keras.layers.Layer):
     def __init__(self, filters, kernel_size, strides):
         super(ResnetIdentityBlock, self).__init__(name='resnet_block')
         self.conv1a = Conv1D(filters, kernel_size=kernel_size, strides=strides, padding='same')
@@ -57,24 +57,24 @@ class BianResNet(tf.keras.Model):
         return self.d1(x)
     
 
-    def train_step(self, data):
-        x, y = data
+    # def train_step(self, data):
+    #     x, y = data
 
-        with tf.GradientTape() as tape:
-            y_pred = self(x, training=True)
-            loss = self.compiled_loss(y, y_pred)
+    #     with tf.GradientTape() as tape:
+    #         y_pred = self(x, training=True)
+    #         loss = self.compiled_loss(y, y_pred)
 
-        gradients = tape.gradient(loss, self.trainable_variables)
-        self.optimizer.apply_gradients(zip(gradients, self.trainable_variables))
-        self.compiled_metrics.update_state(y, y_pred)
+    #     gradients = tape.gradient(loss, self.trainable_variables)
+    #     self.optimizer.apply_gradients(zip(gradients, self.trainable_variables))
+    #     self.compiled_metrics.update_state(y, y_pred)
 
-        return {m.name: m.result() for m in self.metrics}
+    #     return {m.name: m.result() for m in self.metrics}
     
 
-    def test_step(self, data):
-        x, y = data
+    # def test_step(self, data):
+    #     x, y = data
 
-        y_pred = self(x, training=False)
-        self.compiled_loss(y, y_pred)
-        self.compiled_metrics.update_state(y, y_pred)
-        return {m.name: m.result() for m in self.metrics}
+    #     y_pred = self(x, training=False)
+    #     self.compiled_loss(y, y_pred)
+    #     self.compiled_metrics.update_state(y, y_pred)
+    #     return {m.name: m.result() for m in self.metrics}

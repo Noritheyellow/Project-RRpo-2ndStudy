@@ -7,17 +7,18 @@ from keras.layers import Conv1D, AveragePooling1D, MaxPooling1D, Dense, BatchNor
 
 
 class RespBlock(Model):
-    def __init__(self, filters, *args, **kwargs):
+    def __init__(self, filters, kernel_size, dilation_rate, *args, **kwargs):
         super(RespBlock, self).__init__(*args, **kwargs)
-        self.conv11 = Conv1D(filters=filters, kernel_size=3, strides=1, dilation_rate=1, padding='same')
+        self.conv11 = Conv1D(filters=filters, kernel_size=kernel_size, strides=1, dilation_rate=dilation_rate, padding='same')
         self.bn11 = BatchNormalization()
-        self.conv12 = Conv1D(filters=filters, kernel_size=3, strides=1, dilation_rate=1, padding='same')
+
+        self.conv12 = Conv1D(filters=filters, kernel_size=kernel_size, strides=1, dilation_rate=dilation_rate, padding='same')
         self.bn12 = BatchNormalization()
 
-        self.conv2 = Conv1D(filters=filters, kernel_size=3, strides=1, dilation_rate=2, padding='same')
+        self.conv2 = Conv1D(filters=filters, kernel_size=kernel_size, strides=1, dilation_rate=dilation_rate+1, padding='same')
         self.bn2 = BatchNormalization()
 
-        self.conv3 = Conv1D(filters=filters, kernel_size=3, strides=1, dilation_rate=3, padding='same')
+        self.conv3 = Conv1D(filters=filters, kernel_size=kernel_size, strides=1, dilation_rate=dilation_rate+2, padding='same')
         self.bn3 = BatchNormalization()
 
 
@@ -48,15 +49,15 @@ class RespBlock(Model):
 
 
 class DilatedResNet(Model):
-    def __init__(self, num_of_blocks=2, dwn_kernel_size=2, filters=8, *args, **kwargs):
+    def __init__(self, num_of_blocks=2, kernel_size=3, dilation_rate=1, dwn_kernel_size=2, filters=8, units=100, *args, **kwargs):
         super(DilatedResNet, self).__init__(*args, **kwargs)
         self.num_of_blocks = num_of_blocks
-        self.respblk = [RespBlock(filters*(2**i)) for i in range(num_of_blocks)]
+        self.respblk = [RespBlock(filters*(2**i), kernel_size=kernel_size, dilation_rate=dilation_rate) for i in range(num_of_blocks)]
         self.dwnsamp = [Conv1D(filters*(2**i), kernel_size=dwn_kernel_size, strides=2, padding='same') for i in range(num_of_blocks)]
         self.bn = [BatchNormalization() for _ in range(num_of_blocks)]
         self.avgpool = AveragePooling1D(strides=2, padding='valid')
-        self.dense1 = Dense(1000, activation='relu')
-        self.dense2 = Dense(100, activation='relu')
+        self.dense1 = Dense(units=units, activation='relu') #1000
+        self.dense2 = Dense(10, activation='relu') #100
         self.dense3 = Dense(1)
 
 
