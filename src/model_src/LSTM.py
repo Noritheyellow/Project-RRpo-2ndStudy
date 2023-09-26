@@ -18,7 +18,7 @@ warnings.filterwarnings(action='ignore')
 
 # 1st Linear
 class VanillaLSTM(Model):
-    def __init__(self, units=512, *args, **kwargs):
+    def __init__(self, units=256, *args, **kwargs):
         super(VanillaLSTM, self).__init__(*args, **kwargs)
         self.lstm1 = LSTM(units=units, activation='tanh', return_sequences=True, return_state=False)
         self.lstm2 = LSTM(units=units//2, activation='tanh')
@@ -39,7 +39,7 @@ class VanillaLSTM(Model):
 
 
 class CNNLSTM(Model):
-    def __init__(self, init_filters=32, units=512, *args, **kwargs):
+    def __init__(self, init_filters=32, units=256, *args, **kwargs):
         super(CNNLSTM, self).__init__(*args, **kwargs)
         self.conv1 = Conv1D(filters=init_filters, kernel_size=3)
         self.bn1 = BatchNormalization()

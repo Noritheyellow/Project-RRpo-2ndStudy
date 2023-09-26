@@ -49,13 +49,13 @@ class RespBlock(Model):
 
 
 class DilatedResNet(Model):
-    def __init__(self, num_of_blocks=2, kernel_size=3, dilation_rate=1, dwn_kernel_size=2, filters=8, units=100, *args, **kwargs):
+    def __init__(self, num_of_blocks=2, kernel_size=3, dilation_rate=1, dwn_kernel_size=2, filters=8, strides_of_avg=2, units=100, *args, **kwargs):
         super(DilatedResNet, self).__init__(*args, **kwargs)
         self.num_of_blocks = num_of_blocks
         self.respblk = [RespBlock(filters*(2**i), kernel_size=kernel_size, dilation_rate=dilation_rate) for i in range(num_of_blocks)]
         self.dwnsamp = [Conv1D(filters*(2**i), kernel_size=dwn_kernel_size, strides=2, padding='same') for i in range(num_of_blocks)]
         self.bn = [BatchNormalization() for _ in range(num_of_blocks)]
-        self.avgpool = AveragePooling1D(strides=2, padding='valid')
+        self.avgpool = AveragePooling1D(strides=strides_of_avg, padding='valid')
         self.dense1 = Dense(units=units, activation='relu') #1000
         self.dense2 = Dense(10, activation='relu') #100
         self.dense3 = Dense(1)

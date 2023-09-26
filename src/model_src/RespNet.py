@@ -140,9 +140,11 @@ class RespNet(Model):
         x = self.bottleneck(x) # (?, 225, 512)
         x = self.xpath(x, (f1, f2, f3)) # (?, 1800, 256)
 
-        x = self.conv1(x) # (?, 1800, 1)
+        x = self.conv1(x) # (?, 1800, 1) # 여기가 문제인 듯? 위에 x는 샘플?의 2차원 행렬일텐데 그걸 1차원 conv로 풀려고 하면 256번 하겠지, stride=2에 valid니까 timestep은 1799일테고,
         x = self.bn1(x)
         x = LeakyReLU(alpha=0.2)(x)
+
+        x = Flatten()(x)
 
         x = self.d100(x)
         x = self.d50(x)
